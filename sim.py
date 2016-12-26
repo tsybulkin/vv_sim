@@ -19,6 +19,7 @@ def run(dt=0.1, obstacles_nbr=3):
 
 	# run simulation
 	t = 0.
+	sim_log = ([],[ [] for _ in range(obstacles_nbr) ]
 
 	while t < SIM_TIME:
 		t += dt
@@ -26,13 +27,24 @@ def run(dt=0.1, obstacles_nbr=3):
 			pers.move(env,dt)
 
 		bot.move(env,dt)
-		show_sim(env)
+		log(sim_log, env)
+
+	damp_as_svg(sim_log)
 
 
-def show_sim(env):
+
+def log(sim_log, env):
 	bot,obstacles = env
+	(bot_log, obstacles_logs) = sim_log
 
-	print "bot: (%.1f, %.1f)  "%tuple(bot.xy),  "obstacles:", [ o.xy for o in obstacles]
+	bot_log.append(bot.xy)
+
+	for i in range(len(obstacles)):
+		obstacles_logs[i].append(obstacles[i].xy)
+
+
+def damp_as_svg(sim_log):
+	
 
 
 
