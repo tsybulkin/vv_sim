@@ -66,7 +66,8 @@ class Person():
 
 
 	def turn_back(self):
-		self.turn_left(self.turn_left())
+		self.turn_left()
+		self.turn_left()
 
 
 	def wait(self, dt):
