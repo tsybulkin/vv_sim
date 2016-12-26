@@ -7,7 +7,7 @@ RIGHT_90 = np.array([[0., 1.],
 LEFT_90 = np.array([[0.,-1.],
 					[1., 0.]])
 
-OBJ_MIN_DIST = 0.7
+OBJ_MIN_DIST = 0.8
 
 
 class Person():
@@ -21,6 +21,7 @@ class Person():
 
 		self.path = path[:]
 		self.w2 = w2
+		self.pause = 0.
 
 		self.xy = np.array([np.random.uniform(x_min-w2, x_max+w2),
 							np.random.uniform(y_min-w2, y_max+w2)])
@@ -33,12 +34,17 @@ class Person():
 		xy = self.xy + self.v * dt
 
 		if self.collide(xy, env): self.wait(dt)
-		if self.inside(xy): self.xy = xy
+		elif self.inside(xy): self.xy = xy
 		elif flip_coin(): self.turn_right()
 		elif flip_coin(): self.turn_left()
 		else: self.turn_back()
 
 	def collide(self, xy, env):
+		(bot, people) = env
+		for pers in people:
+			if pers != self:
+				if np.linalg.norm(xy-pers.xy) < OBJ_MIN_DIST:
+					return True
 		return False
 
 
@@ -74,7 +80,7 @@ class Person():
 		self.pause += dt
 		if self.pause > PAUSE:
 			self.pause = np.random.uniform(0.,0.3)
-			self.v = np.random.choice([np.array([0.,1.]), np.array([0.,-1.]),
+			self.v = random.choice([np.array([0.,1.]), np.array([0.,-1.]),
 									np.array([1.,0.]), np.array([-1.,0.]),
 									np.array([0.,0.])])
 

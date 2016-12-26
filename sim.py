@@ -7,7 +7,7 @@ LEFT_MARGIN = 100
 TOP_MARGIN = 100
 PERSON_RADIUS = 0.3
 
-SIM_TIME = 10.
+SIM_TIME = 20.
 
 
 def run(dt=0.1, obstacles_nbr=10):
