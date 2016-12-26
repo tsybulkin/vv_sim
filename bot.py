@@ -27,7 +27,8 @@ class Bot():
 		self.path_w = w
 		self.path = path
 		
-
+	def move(self,env, dt):
+		pass
 
 
 def sonic_sense(xy, a, env):

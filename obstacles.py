@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 PAUSE = 2.
 RIGHT_90 = np.array([[0., 1.],
@@ -22,9 +23,9 @@ class Person():
 		self.w2 = w2
 
 		self.xy = np.array([np.random.uniform(x_min-w2, x_max+w2),
-							np.random.uniform(y_min-w2, y_max_w2)])
+							np.random.uniform(y_min-w2, y_max+w2)])
 
-		self.v = np.random.choice([np.array([0.,1.]), np.array([0.,-1.]),
+		self.v = random.choice([np.array([0.,1.]), np.array([0.,-1.]),
 									np.array([1.,0.]), np.array([-1.,0.]),
 									np.array([0.,0.])])
 
@@ -33,15 +34,16 @@ class Person():
 
 		if self.collide(xy, env): self.wait(dt)
 		if self.inside(xy): self.xy = xy
-		elif flip.coin(): self.turn_right()
-		elif flip.coin(): self.turn_left()
+		elif flip_coin(): self.turn_right()
+		elif flip_coin(): self.turn_left()
 		else: self.turn_back()
 
-	def collide(self, env):
+	def collide(self, xy, env):
 		return False
 
 
 	def inside(self,xy):
+		path = self.path
 		return any( self.inside_segment(xy,path[i],path[i+1]) for i in range(len(self.path)-1))
 
 	
@@ -51,7 +53,7 @@ class Person():
 		x_max = max(xy1[0],xy2[0])
 		y_max = max(xy1[1],xy2[1])
 		w2 = self.w2
-		return x >= x_min - w2 and x <= x_max + w2 and
+		return x >= x_min - w2 and x <= x_max + w2 and \
 				y >= y_min - w2 and y <= y_max + w2
 
 	
@@ -74,4 +76,9 @@ class Person():
 			self.v = np.random.choice([np.array([0.,1.]), np.array([0.,-1.]),
 									np.array([1.,0.]), np.array([-1.,0.]),
 									np.array([0.,0.])])
+
+
+
+def flip_coin(p=0.5): return np.random.uniform() < p
+
 
