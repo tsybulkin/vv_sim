@@ -1,13 +1,13 @@
 import numpy as np
 import random
 
-PAUSE = 2.
+PAUSE = 1.
 RIGHT_90 = np.array([[0., 1.],
 					 [-1.,0.]])
 LEFT_90 = np.array([[0.,-1.],
 					[1., 0.]])
 
-OBJ_MIN_DIST = 0.8
+OBJ_MIN_DIST = 0.7
 
 
 class Person():
@@ -27,8 +27,7 @@ class Person():
 							np.random.uniform(y_min-w2, y_max+w2)])
 
 		self.v = random.choice([np.array([0.,1.]), np.array([0.,-1.]),
-									np.array([1.,0.]), np.array([-1.,0.]),
-									np.array([0.,0.])])
+									np.array([1.,0.]), np.array([-1.,0.])])
 
 	def move(self,env,dt):
 		xy = self.xy + self.v * dt
@@ -59,8 +58,8 @@ class Person():
 		x_max = max(xy1[0],xy2[0])
 		y_max = max(xy1[1],xy2[1])
 		w2 = self.w2
-		return x >= x_min - w2 and x <= x_max + w2 and \
-				y >= y_min - w2 and y <= y_max + w2
+		return x >= x_min-w2+0.5 and x <= x_max+w2-0.5 and \
+				y >= y_min-w2+0.5 and y <= y_max+w2-0.5
 
 	
 	def turn_right(self):
@@ -81,8 +80,7 @@ class Person():
 		if self.pause > PAUSE:
 			self.pause = np.random.uniform(0.,0.3)
 			self.v = random.choice([np.array([0.,1.]), np.array([0.,-1.]),
-									np.array([1.,0.]), np.array([-1.,0.]),
-									np.array([0.,0.])])
+									np.array([1.,0.]), np.array([-1.,0.])])
 
 
 

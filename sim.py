@@ -7,7 +7,7 @@ LEFT_MARGIN = 100
 TOP_MARGIN = 100
 PERSON_RADIUS = 0.3
 
-SIM_TIME = 20.
+SIM_TIME = 30.
 
 
 def run(dt=0.1, obstacles_nbr=10):
@@ -17,11 +17,17 @@ def run(dt=0.1, obstacles_nbr=10):
 	path_width = 4.
 
 	# init robot, obstacles, environment
-	obstacles = [  Person(path, path_width) for _ in range(obstacles_nbr) ]
+	obstacles = []
 	x,y = path[0]
 	bot = Bot(x,y)
 	bot.set_path(path,path_width)
 	env = (bot, obstacles)
+
+	while len(obstacles) < obstacles_nbr:
+		pers = Person(path, path_width)
+		if pers.collide(pers.xy, env): continue
+		obstacles.append(pers)
+
 
 	# run simulation
 	t = 0.
