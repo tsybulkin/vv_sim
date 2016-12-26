@@ -5,11 +5,12 @@ import numpy as np
 WIDTH,HEIGHT = 1100, 650
 LEFT_MARGIN = 100
 TOP_MARGIN = 100
+PERSON_RADIUS = 0.3
 
 SIM_TIME = 10.
 
 
-def run(dt=0.1, obstacles_nbr=3):
+def run(dt=0.1, obstacles_nbr=10):
 	# init environment and path
 	path = [np.array([0.,0]), np.array([0.,10.]),
 			np.array([8.,10.]), np.array([8.,14.])]
@@ -34,7 +35,7 @@ def run(dt=0.1, obstacles_nbr=3):
 		bot.move(env,dt)
 		log(sim_log, env)
 
-	damp_as_svg(sim_log, path, path_width)
+	damp_as_svg(sim_log, path, path_width, dt)
 
 
 def log(sim_log, env):
@@ -47,15 +48,15 @@ def log(sim_log, env):
 		obstacles_logs[i].append(obstacles[i].xy)
 
 
-def damp_as_svg((bot_log, obstacles_logs), path, path_w):
+def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 
 	X_MIN,Y_MIN,X_MAX,Y_MAX = get_mbr((bot_log, obstacles_logs))
 	x_scale = (WIDTH - LEFT_MARGIN) / (X_MAX - X_MIN)
 	y_scale = (HEIGHT - 2*TOP_MARGIN) / (Y_MAX - Y_MIN)
 	scale = min(x_scale,y_scale)
 
-	b_log, ob_logs = (map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT+TOP_MARGIN-int((xy[1]-Y_MIN)*scale)),bot_log), \
-					[ map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT+TOP_MARGIN-int((xy[1]-Y_MIN)*scale)), log)
+	b_log, ob_logs = (map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT-int((xy[1]-Y_MIN)*scale)),bot_log), \
+					[ map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT-int((xy[1]-Y_MIN)*scale)), log)
 						for log in obstacles_logs] )
 	
 	f = open("simulation.html",'w')
@@ -74,6 +75,19 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w):
 	# draw bot
 
 	# draw obstacles
+	pw = int(PERSON_RADIUS*scale)
+	for ob in ob_logs:
+		cx,cy = ob[0]
+		f.write("<circle cx='%i' cy='%i' r='%i' fill='red'>\n" %(cx,cy,pw))
+		T = 0.
+		for x,y in ob:
+			f.write("\t<set attributeName='cx' attributeType='XML'\n \
+         		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(x,T,dt) )
+			f.write("\t<set attributeName='cy' attributeType='XML'\n \
+         		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(y,T,dt) )
+			T += dt
+		f.write("</circle>\n")
+
 
 	f.write("</svg>\n</body>\n</html>")
 	f.close()
