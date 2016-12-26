@@ -2,7 +2,7 @@ from bot import Bot
 from obstacles import Person
 import numpy as np
 
-WIDTH,HEIGHT = 1100,650
+WIDTH,HEIGHT = 1100, 650
 LEFT_MARGIN = 100
 TOP_MARGIN = 100
 
@@ -37,7 +37,6 @@ def run(dt=0.1, obstacles_nbr=3):
 	damp_as_svg(sim_log, path, path_width)
 
 
-
 def log(sim_log, env):
 	bot,obstacles = env
 	(bot_log, obstacles_logs) = sim_log
@@ -48,11 +47,16 @@ def log(sim_log, env):
 		obstacles_logs[i].append(obstacles[i].xy)
 
 
-def damp_as_svg(sim_log, path, path_w):
+def damp_as_svg((bot_log, obstacles_logs), path, path_w):
 
-	X_MIN,Y_MIN,X_MAX,Y_MAX = get_mbr(sim_log)
+	X_MIN,Y_MIN,X_MAX,Y_MAX = get_mbr((bot_log, obstacles_logs))
 	x_scale = (WIDTH - LEFT_MARGIN) / (X_MAX - X_MIN)
-	y_scale = (HEIGHT - TOP_MARGIN) / (Y_MAX - Y_MIN)
+	y_scale = (HEIGHT - 2*TOP_MARGIN) / (Y_MAX - Y_MIN)
+	scale = min(x_scale,y_scale)
+
+	b_log, ob_logs = (map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT+TOP_MARGIN-int((xy[1]-Y_MIN)*scale)),bot_log), \
+					[ map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT+TOP_MARGIN-int((xy[1]-Y_MIN)*scale)), log)
+						for log in obstacles_logs] )
 	
 	f = open("simulation.html",'w')
 	f.write("<html>\n<body>\n<svg width='%i' height='%i'>\n" % (WIDTH,HEIGHT))
@@ -60,12 +64,12 @@ def damp_as_svg(sim_log, path, path_w):
 	# draw path
 	for n in range(len(path)-1):
 		w2 = path_w / 2
-		x_min = min(path[n][0],path[n+1][0])
-		y_min = min(path[n][1],path[n+1][1])
-		x_max = max(path[n][0],path[n+1][0])
-		y_max = max(path[n][1],path[n+1][1])
+		x1 = min(path[n][0],path[n+1][0])-w2
+		y1 = min(path[n][1],path[n+1][1])-w2
+		x2 = max(path[n][0],path[n+1][0])+w2
+		y2 = max(path[n][1],path[n+1][1])+w2
 
-		f.write(svg_rect((0, y_max+w2), (x_max-x_min+2*w2, y_max-y_min+2*w2), 'rgb(200,200,200)', x_scale,y_scale))
+		f.write(svg_rect(LEFT_MARGIN+int((x1-X_MIN)*scale), HEIGHT-int((y2-Y_MIN)*scale), int((x2-x1)*scale), int((y2-y1)*scale), 'rgb(200,200,200)'))
 
 	# draw bot
 
@@ -75,17 +79,10 @@ def damp_as_svg(sim_log, path, path_w):
 	f.close()
 
 
-def svg_rect((x1,y1), (x2,y2), color, x_scale, y_scale):
-	X,Y = px((x1,y1),x_scale,y_scale)
-	W,H = px((x2-x1,y2-y1),x_scale,y_scale)
+def svg_rect(x,y, w,h, color):
 	return "<rect x='%i' y='%i' width='%i' height='%i' \
-			style='fill:%s' />\n" % (X,Y,W,H,color)
+			style='fill:%s' />\n" % (x,y,w,h,color)
 
-
-def px(xy,x_scale,y_scale):
-	x = int(round(xy[0]*x_scale))
-	y = HEIGHT - int(round(xy[1]*y_scale))
-	return LEFT_MARGIN+x, TOP_MARGIN+y
 
 
 def get_mbr((bot_log, obstacles_logs)):
