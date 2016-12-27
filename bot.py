@@ -17,7 +17,7 @@ class Bot():
 		self.sonic_measurements = (None,None,None)
 
 		# ultra sonic sensors
-		self.sonic_sensors = [(0.25,-np.pi/12), (0.25,0.), (0.25,np.pi/12)]
+		self.sonic_sensors = [(0.25,np.pi/12), (0.25,0.), (0.25,-np.pi/12)]
 
 
 	def sense_distance(self, env):
@@ -37,8 +37,16 @@ class Bot():
 
 		
 	def move(self, env, dt):
+		print "\n",self.xy
+
 		self.sense_distance(env)
 		self.control()
+
+		(_,obstacles) = env
+		for ob in obstacles:
+			if np.linalg.norm(self.xy-ob.xy)<2.:print ob.xy,
+		print " "
+
 		self.xy += self.v * np.array([np.cos(self.th),
 									np.sin(self.th)]) * dt
 		self.log.append((self.xy.copy(), self.sonic_measurements))
@@ -60,21 +68,20 @@ class Bot():
 
 	
 	def control(self):
+		self.th = np.pi/2
 		print self.sonic_measurements
 
-		if self.sonic_measurements[1] == None: 
-			self.v = 1.
-			self.th = np.pi/2
-		elif self.sonic_measurements[1] < 2.5:
+		
+		if self.sonic_measurements[1] != None and self.sonic_measurements[1] < 1.5: self.v = 0.
+		elif self.sonic_measurements[0] != None and self.sonic_measurements[0] < 1.: self.v = 0.
+		elif self.sonic_measurements[2] != None and self.sonic_measurements[2] < 1.: self.v = 0.
+		
+		elif self.sonic_measurements[1] != None and self.sonic_measurements[1] < 2.5:
 			self.v = 0.5
-			self.th = np.pi/2
-
-		elif self.sonic_measurements[1] < 1.5:
-			self.v = 0.
-			self.th = np.pi/2
-
-		elif self.sonic_measurements[0] < 1.: self.v = 0.
-		elif self.sonic_measurements[2] < 1.: self.v = 0.
-
+		
+		else: 
+			self.v = 1.
+			
+		
 
 

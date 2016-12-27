@@ -73,6 +73,7 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 	(cx,cy),_ = b_log[0]
 	bw = int(BOT_RADIUS*scale)
 	f.write("<circle cx='%i' cy='%i' r='%i' fill='green'>\n" %(cx,cy,bw))
+	
 	T = 0.
 	for (x,y),_ in b_log:
 		f.write("\t<set attributeName='cx' attributeType='XML'\n \
@@ -81,7 +82,7 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
      		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(y,T,dt) )
 		T += dt
 	f.write("</circle>\n")
-
+	
 	# draw obstacles
 	pw = int(PERSON_RADIUS*scale)
 	for ob in ob_logs:

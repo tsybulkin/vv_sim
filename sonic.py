@@ -19,8 +19,8 @@ def sonic_sense(xy, th, obstacles_xy):
 	for ob_xy in obstacles_xy:
 		if np.dot(ob_xy-xy, n1) < -0.2: continue
 		if np.dot(ob_xy-xy, n2) < -0.2: continue
-		if np.dot(ob_xy-xy, n3) < -WIDTH/2: continue
-		if np.dot(ob_xy-xy, n3) > WIDTH/2: continue
+		if np.dot(ob_xy-xy, n3) < -WIDTH/2-0.2: continue
+		if np.dot(ob_xy-xy, -n3)< -WIDTH/2-0.2: continue
 		if np.linalg.norm(ob_xy-xy) > LENGTH: continue
 		detected.append(np.linalg.norm(xy-ob_xy))
 	
