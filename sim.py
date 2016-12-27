@@ -11,7 +11,7 @@ BOT_RADIUS = 0.25
 SIM_TIME = 15.
 
 
-def run(dt=0.1, obstacles_nbr=10):
+def run(dt=0.1, obstacles_nbr=20):
 	# init environment and path
 	path = [np.array([0.,0.]), np.array([0.,10.]),
 			np.array([8.,10.]), np.array([8.,14.])]
@@ -40,20 +40,10 @@ def run(dt=0.1, obstacles_nbr=10):
 		for pers in obstacles:
 			pers.move(env,dt)
 
-		bot.move(env,dt)
-		log(sim_log, env)
+		bot.move(env, dt)
+	
+	damp_as_svg((bot.log,map(lambda pers: pers.log, obstacles)), path, path_width, dt)
 
-	damp_as_svg(sim_log, path, path_width, dt)
-
-
-def log(sim_log, env):
-	bot,obstacles = env
-	(bot_log, obstacles_logs) = sim_log
-
-	bot_log.append(bot.xy.copy())
-
-	for i in range(len(obstacles)):
-		obstacles_logs[i].append(obstacles[i].xy.copy())
 
 
 def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
@@ -62,7 +52,7 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 	y_scale = (HEIGHT - 2*TOP_MARGIN) / (Y_MAX - Y_MIN)
 	scale = min(x_scale,y_scale)
 
-	b_log, ob_logs = (map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT-int((xy[1]-Y_MIN)*scale)),bot_log), \
+	b_log, ob_logs = (map(lambda (xy,sensors):((LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT-int((xy[1]-Y_MIN)*scale)),sensors),bot_log), \
 					[ map(lambda xy:(LEFT_MARGIN+int((xy[0]-X_MIN)*scale), HEIGHT-int((xy[1]-Y_MIN)*scale)), log)
 						for log in obstacles_logs] )
 	
@@ -80,11 +70,11 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 		f.write(svg_rect(LEFT_MARGIN+int((x1-X_MIN)*scale), HEIGHT-int((y2-Y_MIN)*scale), int((x2-x1)*scale), int((y2-y1)*scale), 'rgb(200,200,200)'))
 
 	# draw bot
-	cx,cy = b_log[0]
+	(cx,cy),_ = b_log[0]
 	bw = int(BOT_RADIUS*scale)
 	f.write("<circle cx='%i' cy='%i' r='%i' fill='green'>\n" %(cx,cy,bw))
 	T = 0.
-	for x,y in b_log:
+	for (x,y),_ in b_log:
 		f.write("\t<set attributeName='cx' attributeType='XML'\n \
      		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(x,T,dt) )
 		f.write("\t<set attributeName='cy' attributeType='XML'\n \
@@ -118,10 +108,10 @@ def svg_rect(x,y, w,h, color):
 
 
 def get_mbr((bot_log, obstacles_logs)):
-	x_min = min( xy[0] for xy in bot_log)
-	y_min = min( xy[1] for xy in bot_log)
-	x_max = max( xy[0] for xy in bot_log)
-	y_max = max( xy[1] for xy in bot_log)
+	x_min = min( xy[0] for (xy,_) in bot_log)
+	y_min = min( xy[1] for (xy,_) in bot_log)
+	x_max = max( xy[0] for (xy,_) in bot_log)
+	y_max = max( xy[1] for (xy,_) in bot_log)
 	for log in obstacles_logs:
 		x_min = min(x_min, min(xy[0] for xy in log))
 		y_min = min(y_min, min(xy[1] for xy in log))

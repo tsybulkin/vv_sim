@@ -22,6 +22,7 @@ class Person():
 		self.path = path[:]
 		self.w2 = w2
 		self.pause = 0.
+		self.log = []
 
 		self.xy = np.array([np.random.uniform(x_min-w2+0.5, x_max+w2-0.5),
 							np.random.uniform(y_min-w2+0.5, y_max+w2-0.5)])
@@ -37,7 +38,9 @@ class Person():
 		elif flip_coin(): self.turn_right()
 		elif flip_coin(): self.turn_left()
 		else: self.turn_back()
+		self.log.append(self.xy.copy())
 
+	
 	def collide(self, xy, env):
 		(bot, people) = env
 		for pers in people:

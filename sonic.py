@@ -17,21 +17,11 @@ def sonic_sense(xy, th, obstacles_xy):
 
 	detected = []
 	for ob_xy in obstacles_xy:
-		if np.dot(ob_xy-xy, n1) < 0: 
-			print "n1"
-			continue
-		if np.dot(ob_xy-xy, n2) < 0: 
-			print "n2"
-			continue
-		if np.dot(ob_xy-xy, n3) < -WIDTH/2: 
-			print "n3"
-			continue
-		if np.dot(ob_xy-xy, n3) > WIDTH/2: 
-			print "n4"
-			continue
-		if np.linalg.norm(ob_xy-xy) > LENGTH: 
-			print "n5"
-			continue
+		if np.dot(ob_xy-xy, n1) < -0.2: continue
+		if np.dot(ob_xy-xy, n2) < -0.2: continue
+		if np.dot(ob_xy-xy, n3) < -WIDTH/2: continue
+		if np.dot(ob_xy-xy, n3) > WIDTH/2: continue
+		if np.linalg.norm(ob_xy-xy) > LENGTH: continue
 		detected.append(np.linalg.norm(xy-ob_xy))
 	
 	if len(detected) == 0: return None
@@ -47,8 +37,9 @@ def rotate(vect, a):
 
 
 def test():
-	obstacles = [ np.array([0.9, 1.5]), np.array([2.,2.5]), np.array([1.5,4]) ]
+	obstacles = [ np.array([0.9, 1.5]), np.array([2.,2.5]), np.array([1.5,4]), 
+				np.array([1.5,1.2]) ]
 	xy = np.array([1.,1.])
-	print sonic_sense(xy,np.pi/3,obstacles), np.linalg.norm(np.array([2.,2.5])-xy) 
+	assert sonic_sense(xy,np.pi/3,obstacles) == np.linalg.norm(np.array([2.,2.5])-xy) 
 
 

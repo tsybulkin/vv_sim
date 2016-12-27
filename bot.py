@@ -13,6 +13,8 @@ class Bot():
 		self.v = 0.
 		self.dv = 0.5  # 1/20 of G
 		self.dw = 1.
+		self.log = []
+		self.sonic_measurements = (None,None,None)
 
 		# ultra sonic sensors
 		self.sonic_sensors = [(0.25,-np.pi/12), (0.25,0.), (0.25,np.pi/12)]
@@ -26,17 +28,20 @@ class Bot():
 									 self.th+a, [ ob.xy for ob in obstacles]) 
 			for (r,a) in self.sonic_sensors]
 
-		return measurements
+		self.sonic_measurements = tuple(measurements)
 
 
 	def set_path(self, path, w):
 		self.path_w = w
 		self.path = path
+
 		
 	def move(self, env, dt):
-		self.control(self.sense_distance(env))
+		self.sense_distance(env)
+		self.control()
 		self.xy += self.v * np.array([np.cos(self.th),
 									np.sin(self.th)]) * dt
+		self.log.append((self.xy.copy(), self.sonic_measurements))
 
 	def inside(self):
 		path = self.path
@@ -54,11 +59,22 @@ class Bot():
 				y >= y_min-w2+0.5 and y <= y_max+w2-0.5
 
 	
-	def control(self, sonic_measuraments):
-		self.v = 1.
-		self.th = np.pi/2
+	def control(self):
+		print self.sonic_measurements
 
+		if self.sonic_measurements[1] == None: 
+			self.v = 1.
+			self.th = np.pi/2
+		elif self.sonic_measurements[1] < 2.5:
+			self.v = 0.5
+			self.th = np.pi/2
 
+		elif self.sonic_measurements[1] < 1.5:
+			self.v = 0.
+			self.th = np.pi/2
+
+		elif self.sonic_measurements[0] < 1.: self.v = 0.
+		elif self.sonic_measurements[2] < 1.: self.v = 0.
 
 
 
