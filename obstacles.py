@@ -23,8 +23,8 @@ class Person():
 		self.w2 = w2
 		self.pause = 0.
 
-		self.xy = np.array([np.random.uniform(x_min-w2, x_max+w2),
-							np.random.uniform(y_min-w2, y_max+w2)])
+		self.xy = np.array([np.random.uniform(x_min-w2+0.5, x_max+w2-0.5),
+							np.random.uniform(y_min-w2+0.5, y_max+w2-0.5)])
 
 		self.v = random.choice([np.array([0.,1.]), np.array([0.,-1.]),
 									np.array([1.,0.]), np.array([-1.,0.])])
@@ -44,6 +44,7 @@ class Person():
 			if pers != self:
 				if np.linalg.norm(xy-pers.xy) < OBJ_MIN_DIST:
 					return True
+		if np.linalg.norm(xy-bot.xy) < OBJ_MIN_DIST: return True
 		return False
 
 

@@ -6,13 +6,14 @@ WIDTH,HEIGHT = 1100, 650
 LEFT_MARGIN = 100
 TOP_MARGIN = 100
 PERSON_RADIUS = 0.3
+BOT_RADIUS = 0.25
 
-SIM_TIME = 30.
+SIM_TIME = 15.
 
 
 def run(dt=0.1, obstacles_nbr=10):
 	# init environment and path
-	path = [np.array([0.,0]), np.array([0.,10.]),
+	path = [np.array([0.,0.]), np.array([0.,10.]),
 			np.array([8.,10.]), np.array([8.,14.])]
 	path_width = 4.
 
@@ -20,6 +21,7 @@ def run(dt=0.1, obstacles_nbr=10):
 	obstacles = []
 	x,y = path[0]
 	bot = Bot(x,y)
+
 	bot.set_path(path,path_width)
 	env = (bot, obstacles)
 
@@ -48,14 +50,13 @@ def log(sim_log, env):
 	bot,obstacles = env
 	(bot_log, obstacles_logs) = sim_log
 
-	bot_log.append(bot.xy)
+	bot_log.append(bot.xy.copy())
 
 	for i in range(len(obstacles)):
-		obstacles_logs[i].append(obstacles[i].xy)
+		obstacles_logs[i].append(obstacles[i].xy.copy())
 
 
 def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
-
 	X_MIN,Y_MIN,X_MAX,Y_MAX = get_mbr((bot_log, obstacles_logs))
 	x_scale = (WIDTH - LEFT_MARGIN) / (X_MAX - X_MIN)
 	y_scale = (HEIGHT - 2*TOP_MARGIN) / (Y_MAX - Y_MIN)
@@ -79,6 +80,17 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 		f.write(svg_rect(LEFT_MARGIN+int((x1-X_MIN)*scale), HEIGHT-int((y2-Y_MIN)*scale), int((x2-x1)*scale), int((y2-y1)*scale), 'rgb(200,200,200)'))
 
 	# draw bot
+	cx,cy = b_log[0]
+	bw = int(BOT_RADIUS*scale)
+	f.write("<circle cx='%i' cy='%i' r='%i' fill='green'>\n" %(cx,cy,bw))
+	T = 0.
+	for x,y in b_log:
+		f.write("\t<set attributeName='cx' attributeType='XML'\n \
+     		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(x,T,dt) )
+		f.write("\t<set attributeName='cy' attributeType='XML'\n \
+     		to='%i' begin='%.2fs' dur='%.2fs' />\n" %(y,T,dt) )
+		T += dt
+	f.write("</circle>\n")
 
 	# draw obstacles
 	pw = int(PERSON_RADIUS*scale)
