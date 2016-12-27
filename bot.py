@@ -1,4 +1,6 @@
 import numpy as np
+from sonic import sonic_sense
+
 
 SONIC_MAX_DISTANCE = 5.0
 
@@ -17,9 +19,11 @@ class Bot():
 
 
 	def sense_distance(self, env):
+		(_,obstacles) = env
+
 		measurements = [ sonic_sense(self.xy+r*np.array([np.cos(self.th+a),
 														 np.sin(self.th+a)]),
-									 self.th+a, env) 
+									 self.th+a, [ ob.xy for ob in obstacles]) 
 			for (r,a) in self.sonic_sensors]
 
 		return measurements
@@ -56,10 +60,5 @@ class Bot():
 
 
 
-def sonic_sense(xy, a, env):
-	"""Measures and returns the distance to the closest object within range of 
-	ultrasonic sensor. Returns None if no object detected. 
-	"""
-	return None
 
 
