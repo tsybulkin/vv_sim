@@ -6,6 +6,7 @@ LENGTH = 5.0
 WIDTH = 0.6
 
 
+
 def sonic_sense(xy, th, obstacles_xy):
 	"""Measures and returns the distance to the closest object within range of 
 	ultrasonic sensor. Returns None if no object detected. 
@@ -24,7 +25,7 @@ def sonic_sense(xy, th, obstacles_xy):
 		if np.linalg.norm(ob_xy-xy) > LENGTH: continue
 		detected.append(np.linalg.norm(xy-ob_xy))
 	
-	if len(detected) == 0: return None
+	if len(detected) == 0: return LENGTH
 	else:
 		detected.sort()
 		return detected[0]

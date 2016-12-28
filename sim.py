@@ -8,7 +8,7 @@ TOP_MARGIN = 100
 PERSON_RADIUS = 0.3
 BOT_RADIUS = 0.25
 
-SIM_TIME = 15.
+SIM_TIME = 20.
 
 
 def run(dt=0.1, obstacles_nbr=20):

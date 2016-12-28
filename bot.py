@@ -72,15 +72,14 @@ class Bot():
 		print self.sonic_measurements
 
 		
-		if self.sonic_measurements[1] != None and self.sonic_measurements[1] < 1.5: self.v = 0.
-		elif self.sonic_measurements[0] != None and self.sonic_measurements[0] < 1.: self.v = 0.
-		elif self.sonic_measurements[2] != None and self.sonic_measurements[2] < 1.: self.v = 0.
+		if self.sonic_measurements[1] < 1.: self.v = 0.
+		elif self.sonic_measurements[2] < 1.: self.v = 0.
+
+		elif self.sonic_measurements[0] < 1.5: self.v = 0.25
 		
-		elif self.sonic_measurements[1] != None and self.sonic_measurements[1] < 2.5:
-			self.v = 0.5
+		elif self.sonic_measurements[1] < 2.5: self.v = 0.5
 		
-		else: 
-			self.v = 1.
+		else: self.v = 1.
 			
 		
 
