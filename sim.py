@@ -8,10 +8,10 @@ TOP_MARGIN = 100
 PERSON_RADIUS = 0.3
 BOT_RADIUS = 0.25
 
-SIM_TIME = 20.
+SIM_TIME = 40.
 
 
-def run(dt=0.1, obstacles_nbr=20):
+def run(dt=0.1, obstacles_nbr=12):
 	# init environment and path
 	path = [np.array([0.,0.]), np.array([0.,10.]),
 			np.array([8.,10.]), np.array([8.,14.])]

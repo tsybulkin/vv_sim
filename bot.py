@@ -13,12 +13,13 @@ class Bot():
 		self.xy = np.array([x,y])
 		self.th = np.pi/2.
 		self.v = 0.
-		self.dv = 1.0  # 1/10 of G
+		self.dv = 1.5  # 1/10 of G
 		self.dw = 1.
 		
 		self.log = []
 		self.sonic_measurements = (None,None,None)
 		self.path = []
+		self.goal = None
 
 		# ultra sonic sensors
 		self.sonic_sensors = [(0.25,np.pi/12), (0.25,0.), (0.25,-np.pi/12)]
@@ -37,7 +38,8 @@ class Bot():
 
 	def set_path(self, path, w):
 		self.path_w = w
-		self.path = path
+		self.path = path[:]
+		if len(path) > 0: self.set_goal(self.path.pop(0))
 
 		
 	def move(self, env, dt):
@@ -48,13 +50,14 @@ class Bot():
 
 		(_,obstacles) = env
 		for ob in obstacles:
-			if np.linalg.norm(self.xy-ob.xy)<2.:print ob.xy,
+			if np.linalg.norm(self.xy-ob.xy) < 2. :print ob.xy,
 		print " "
 
 		self.xy += self.v * np.array([np.cos(self.th),
 									np.sin(self.th)]) * dt
 		self.log.append((self.xy.copy(), self.sonic_measurements))
 
+	
 	def inside(self):
 		path = self.path
 		return any( self.inside_segment(path[i],path[i+1]) for i in range(len(self.path)-1))
@@ -77,18 +80,29 @@ class Bot():
 
 
 	def path_follow(self,dt):
-		if self.path == []:
+		if self.goal == None:
 			self.stop(dt)
+		elif np.linalg.norm(self.goal-self.xy) < 0.4:
+			if len(self.path) > 0:
+				self.set_goal(self.path.pop(0))
+				print 'new goal:', self.goal, 'path:', self.path
+			else:
+				self.goal = None
+	
+
+	def set_goal(self, new_goal):
+		self.goal = new_goal
+		self.th = np.arctan2(new_goal[1]-self.xy[1],new_goal[0]-self.xy[0])
 
 
 	def collision_prevention(self,dt):
 		print self.sonic_measurements
 		
 		if self.sonic_measurements[1] < 1.7: self.stop(dt)
-		elif self.sonic_measurements[2] < 1.: self.stop(dt)
-		elif self.sonic_measurements[0] < 1.: self.stop(dt)
+		elif self.sonic_measurements[2] < 1.1: self.stop(dt)
+		elif self.sonic_measurements[0] < 1.1: self.stop(dt)
 
-		elif self.sonic_measurements[1] < 2.5: self.slow_down(dt)		
+		elif self.sonic_measurements[1] < 2.2: self.slow_down(dt)		
 		else: self.ramp_up(dt)
 			
 	
@@ -96,6 +110,7 @@ class Bot():
 		self.v += -self.dv * dt
 		if self.v < SLOW_SPEED: self.v = SLOW_SPEED
 
+	
 	def ramp_up(self,dt):
 		self.v += self.dv * dt
 		if self.v > MAX_SPEED: self.v = MAX_SPEED
