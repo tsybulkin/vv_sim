@@ -11,9 +11,9 @@ class Bot():
 	def __init__(self, x=0.,y=0.):
 		# coords
 		self.xy = np.array([x,y])
-		self.th = 0.
+		self.th = np.pi/2.
 		self.v = 0.
-		self.dv = 0.5  # 1/20 of G
+		self.dv = 1.0  # 1/10 of G
 		self.dw = 1.
 		
 		self.log = []
@@ -44,7 +44,7 @@ class Bot():
 		print "\n",self.xy
 
 		self.sense_distance(env)
-		self.control()
+		self.control(dt)
 
 		(_,obstacles) = env
 		for ob in obstacles:
@@ -76,7 +76,7 @@ class Bot():
 		self.path_follow(dt)
 
 
-	def path_follow(self):
+	def path_follow(self,dt):
 		if self.path == []:
 			self.stop(dt)
 
@@ -84,10 +84,11 @@ class Bot():
 	def collision_prevention(self,dt):
 		print self.sonic_measurements
 		
-		if self.sonic_measurements[1] < 1.: self.stop(dt)
+		if self.sonic_measurements[1] < 1.7: self.stop(dt)
 		elif self.sonic_measurements[2] < 1.: self.stop(dt)
+		elif self.sonic_measurements[0] < 1.: self.stop(dt)
 
-		elif self.sonic_measurements[1] < 1.5: self.slow_down(dt)		
+		elif self.sonic_measurements[1] < 2.5: self.slow_down(dt)		
 		else: self.ramp_up(dt)
 			
 	
