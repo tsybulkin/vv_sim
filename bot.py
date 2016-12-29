@@ -3,6 +3,8 @@ from sonic import sonic_sense
 
 
 SONIC_MAX_DISTANCE = 5.0
+SLOW_SPEED = 0.5
+MAX_SPEED = 1.
 
 
 class Bot():
@@ -13,8 +15,10 @@ class Bot():
 		self.v = 0.
 		self.dv = 0.5  # 1/20 of G
 		self.dw = 1.
+		
 		self.log = []
 		self.sonic_measurements = (None,None,None)
+		self.path = []
 
 		# ultra sonic sensors
 		self.sonic_sensors = [(0.25,np.pi/12), (0.25,0.), (0.25,-np.pi/12)]
@@ -67,20 +71,39 @@ class Bot():
 				y >= y_min-w2+0.5 and y <= y_max+w2-0.5
 
 	
-	def control(self):
-		self.th = np.pi/2
+	def control(self,dt):
+		self.collision_prevention(dt)
+		self.path_follow(dt)
+
+
+	def path_follow(self):
+		if self.path == []:
+			self.stop(dt)
+
+
+	def collision_prevention(self,dt):
 		print self.sonic_measurements
+		
+		if self.sonic_measurements[1] < 1.: self.stop(dt)
+		elif self.sonic_measurements[2] < 1.: self.stop(dt)
 
-		
-		if self.sonic_measurements[1] < 1.: self.v = 0.
-		elif self.sonic_measurements[2] < 1.: self.v = 0.
-
-		elif self.sonic_measurements[0] < 1.5: self.v = 0.25
-		
-		elif self.sonic_measurements[1] < 2.5: self.v = 0.5
-		
-		else: self.v = 1.
+		elif self.sonic_measurements[1] < 1.5: self.slow_down(dt)		
+		else: self.ramp_up(dt)
 			
+	
+	def slow_down(self,dt):
+		self.v += -self.dv * dt
+		if self.v < SLOW_SPEED: self.v = SLOW_SPEED
+
+	def ramp_up(self,dt):
+		self.v += self.dv * dt
+		if self.v > MAX_SPEED: self.v = MAX_SPEED
 		
+
+	def stop(self,dt):
+		self.v += -self.dv * dt
+		if self.v < 0: self.v = 0.
+
+
 
 
