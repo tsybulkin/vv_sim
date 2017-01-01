@@ -69,6 +69,14 @@ def damp_as_svg((bot_log, obstacles_logs), path, path_w, dt):
 
 		f.write(svg_rect(LEFT_MARGIN+int((x1-X_MIN)*scale), HEIGHT-int((y2-Y_MIN)*scale), int((x2-x1)*scale), int((y2-y1)*scale), 'rgb(200,200,200)'))
 
+	# draw destination
+	(x,y) = path[-1]
+	cx = LEFT_MARGIN+int((x-X_MIN)*scale)
+	cy = HEIGHT-int((y-Y_MIN)*scale)
+	r = int(BOT_RADIUS*scale)*2
+	f.write("<circle cx='%i' cy='%i' r='%i' stroke='black' stroke-width='1' \
+		fill='rgb(200,200,200)' />\n" %(cx,cy,r))
+
 	# draw bot
 	(cx,cy),_ = b_log[0]
 	bw = int(BOT_RADIUS*scale)

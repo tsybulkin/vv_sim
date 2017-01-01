@@ -103,7 +103,7 @@ class Bot():
 		elif self.sonic_measurements[0] < 1.1: self.stop(dt)
 
 		elif self.sonic_measurements[1] < 2.2: self.slow_down(dt)		
-		else: self.ramp_up(dt)
+		elif self.goal != None: self.ramp_up(dt)
 			
 	
 	def slow_down(self,dt):
